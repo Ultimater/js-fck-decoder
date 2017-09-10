@@ -1,5 +1,4 @@
-Demo: https://jsfiddle.net/w1th9pb9/
-
+Demo: https://jsfiddle.net/cLzf74kL/
 
 ```
 var encoded2='window[[17795081][+[]].toString(  \n\
@@ -178,11 +177,14 @@ function toDecode(s,l)
         l = s.length;
         s = applyReplacements(s);
         s = s.replace(/\+\("([0-9a-zA-Z'() \\,]+)"\)\+/g,'+"$1"+'); // remove unnessary parentheses
+        s = s.replace(/(?:([\(\[\)])|\s)\+\(\"(\d+)"\)(?:([\)\]]+)|\s)/g,'$1$2$3'); // resolve numbers
+        s = s.replace(/([\(\[\)\]+]|\s)\((\d+)\+\[(\d+)\]\)([\)\]\+]|\s)/g,'$1("$2$3")$4'); // resolve string numbers
         s = s.replace(/([+(])"([0-9a-zA-Z'() \\,]+)"\+"([0-9a-zA-Z'() \\,]+)"([+)])/g,'$1"$2$3"$4'); // merge concatenations
         s = s.replace(/(?:([\(\[\)]+)|\s)\s*\+\[\"(\d+)\"\]\s*(?:([\)\]]+)|\s)/g,'$1$2$3'); // transform numbers and remove unnessisary whitespace
         s = s.replace(/(?:([\(\[\)]+)|\s)\s*(\d+)(?:([\)\]]+)|\s)/g,'$1$2$3'); // remove unnessisary whitespace
         s = s.replace(/(?:([\(\[\)]+)|\s)\s*(\+\[\])(?:([\)\]]+)|\s)/g,'$10$3'); // remove unnessisary whitespace
         s = s.replace(/(?:([\(\[\)]+)|\s)\s*\-\[\"(\d+)\"\]\s*(?:([\)\]]+)|\s)/g,'$1-$2$3'); // transform numbers and remove unnessisary whitespace
+        s = s.replace(/\((\d+)\)\["toString"\]\("(\d+)"\)/g,function(z,a,b){return '("\\x'+(+a).toString(b).charCodeAt(0).toString(16)+'")'});//resolve toString's
         if(s.length<l){continue;}
         break;
     }
